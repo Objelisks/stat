@@ -1,0 +1,23 @@
+<!doctype html>
+<html ng-app="stat">
+<body>
+  <div>Hello {{ 1+2 }}</div>
+  <div ng-controller="DataBuilder">
+    <form novalidate class="data-input">
+      <!-- change to sliders-->
+      <input type="range" ng-model="datapoint.value" value="50"/>Thing1<br/>
+      <input type="range" ng-model="datapoint.value" value="50"/>Thing2<br/>
+      <input type="range" ng-model="datapoint.value" value="50"/>Thing3<br/>
+      <input type="range" ng-model="datapoint.value" value="50"/>Thing4<br/>
+      <input type="date" ng-model="datapoint.date"/><br/>
+      <input type="submit" ng-click="upload(datapoint)" value="Input Data"/>
+    </form>
+  </div>
+  <div ng-controller="DataGraph">
+    {{graph}}
+  </div>
+  <script src="angular.js"></script>
+  <script src="d3.min.js"></script>
+  <script src="stat.js"></script>
+</body>
+</html>
