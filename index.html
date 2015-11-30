@@ -5,19 +5,21 @@
   <div ng-controller="DataBuilder">
     <form novalidate class="data-input">
       <!-- change to sliders-->
-      <input type="range" ng-model="datapoint.value" value="50"/>Thing1<br/>
-      <input type="range" ng-model="datapoint.value" value="50"/>Thing2<br/>
-      <input type="range" ng-model="datapoint.value" value="50"/>Thing3<br/>
-      <input type="range" ng-model="datapoint.value" value="50"/>Thing4<br/>
+      <datapoint-slider></datapoint-slider>
+      <input type="range" ng-model="datapoint.tag1" value="50"/>Thing1<br/>
+      <input type="range" ng-model="datapoint.tag2" value="50"/>Thing2<br/>
+      <input type="range" ng-model="datapoint.tag3" value="50"/>Thing3<br/>
+      <input type="range" ng-model="datapoint.tag4" value="50"/>Thing4<br/>
       <input type="date" ng-model="datapoint.date"/><br/>
       <input type="submit" ng-click="upload(datapoint)" value="Input Data"/>
     </form>
   </div>
   <div ng-controller="DataGraph">
-    {{graph}}
+    <svg my-data-graph></svg>
   </div>
   <script src="angular.js"></script>
   <script src="d3.min.js"></script>
+  <script src="node_modules/socket.io-client/socket.io.js"></script>
   <script src="stat.js"></script>
 </body>
 </html>
