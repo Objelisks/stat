@@ -8,18 +8,23 @@ io.on('connection', function(socket) {
   socket.on('message', function(msg) {
     console.log('got', msg);
     switch(msg.type) {
-      case "get":
+      case "data":
         // TODO: validate args more
         if(!msg.start || !msg.end) return;
 
         // Sqlite automatically sanitizes args
-        var statement = "SELECT day.date AS date, day.val AS value, tag.tag AS tag " +
-                        "FROM day JOIN tag ON day.tagid = tag.tagid " +
-                        "WHERE day.date BETWEEN $start AND $end";
+        var statement = "SELECT date, val, tagid " +
+                        "FROM day WHERE date BETWEEN $start AND $end " +
+                        "ORDER BY date ASC";
         db.all(statement, { $start: msg.start, $end: msg.end }, function(err, results) {
-          console.log('results', results);
-          socket.emit('message', {'type': 'results', 'results':results});
+          socket.emit('message', {'type': 'data', 'results': results});
         });
+        break;
+      case "tags":
+        var statement = "SELECT tag, tagid FROM tag";
+        db.all(statement, function(err, results) {
+          socket.emit('message', {'type': 'tags', 'results': results});
+        })
         break;
       case "update":
         // TODO: validate args more

@@ -9,11 +9,11 @@ db.serialize(function() {
 
 /*
 
-days
+day
 -----
 date    val   tagid
 
-tags
+tag
 -----
 tagid   tag
 
