@@ -44,24 +44,30 @@ statModule
   .controller('DataBuilder', ['$scope', 'database', function($scope, database) {
     $scope.tags = [];
     $scope.$on('tags', function(e, tags) {
-      tags.forEach(function(t) { t.enabled = true; });
+      var colors = d3.scale.category10();
+      tags.forEach(function(t, i) { t.enabled = true; t.color = {background: colors(i)}; });
       $scope.tags = tags;
       $scope.$digest();
     });
 
     $scope.upload = function(data) {
-      //database.upload(data);
+      var packet = {
+        date: $scope.datapoint.date,
+        values: $scope.tags.map(function(t) { return { tagid: t.tagid, val: t.value }; })
+      }
+
+      database.upload(packet);
       console.log($scope.tags);
     }
     $scope.reset = function() {
-      $scope.datapoint = {};
+      $scope.datapoint = { date: new Date() };
     }
 
     $scope.reset();
   }])
   .directive('datapointSlider', function() {
     return {
-      templateUrl: 'datapoint-slider.html'
+      templateUrl: 'datapoints-slider.html'
     };
   });
 

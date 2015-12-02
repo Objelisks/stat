@@ -30,23 +30,22 @@ io.on('connection', function(socket) {
         // TODO: validate args more
         if(!msg.date) return;
 
-        var insertStatement = "INSERT INTO day VALUES (?)";
-        var updateStatement = "UPDATE day SET day.val = ? WHERE day.date = ? AND day.tagid = ?";
+        var insertStatement = "INSERT INTO day VALUES ($date, $tagid, $val)";
+        var updateStatement = "UPDATE day SET day.val = $val WHERE day.date = $date AND day.tagid = $tagid";
         var query = "SELECT day.val AS Value, day.tagid as Tag FROM day WHERE day.date = $date";
         db.get(query, { $date: msg.date }, function(result) {
+          var useStatement;
           if(result.length > 0) {
-            var update = db.prepare(updateStatement);
-            msg.values.forEach(function(value) {
-              update.run(value);
-            });
-            update.finalize();
+            useStatement = updateStatement;
           } else {
-            var insert = db.prepare(insertStatement);
-            msg.values.forEach(function(value) {
-              insert.run(value);
-            });
-            insert.finalize();
+            useStatement = insertStatement;
           }
+
+          var statement = db.prepare(useStatement);
+          msg.values.forEach(function(value) {
+            statement.run({date: msg.date, tagid: value.tagid, val: value.val});
+          });
+          statement.finalize();
         });
         break;
       default:

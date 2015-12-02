@@ -1,11 +1,11 @@
 <!doctype html>
 <html ng-app="stat">
 <body>
-  <div>Hello {{ 1+2 }}</div>
+  <h1>~Stuff Tracker~</h1>
   <div ng-controller="DataBuilder">
     <form novalidate class="data-input">
 
-      <div datapoint-slider ng-repeat="tag in tags"></div>
+      <div class="datapoint-slider" datapoint-slider ng-repeat="tag in tags" ng-style="{{tag.color}}"></div>
 
       <input type="date" ng-model="datapoint.date"/><br/>
       <input type="submit" ng-click="upload(datapoint)" value="Input Data"/>
@@ -19,5 +19,6 @@
   <script src="node_modules/socket.io-client/socket.io.js"></script>
   <script src="stat.js"></script>
   <link href="style.css" rel="stylesheet">
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:600' rel='stylesheet' type='text/css'>
 </body>
 </html>
