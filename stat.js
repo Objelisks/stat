@@ -68,7 +68,7 @@ statModule
   }])
   .directive('datapointSlider', function() {
     return {
-      templateUrl: 'datapoints-slider.html'
+      templateUrl: 'datapoint-slider.html'
     };
   });
 
