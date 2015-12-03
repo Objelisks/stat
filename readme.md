@@ -25,3 +25,6 @@ node server
 ```
 
 open http://localhost:8080
+
+![Screenshot](https://raw.githubusercontent.com/Objelisks/stat/master/tracker.png)
+
