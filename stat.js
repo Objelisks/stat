@@ -143,6 +143,7 @@ statModule
           .attr('class', 'x axis')
           .call(xAxis);
 
+        // this gets called when the date range selector things get updated
         scope.updateDates = function() {
           console.log('updating dates', scope.startDate);
           $rootScope.startDate = scope.startDate;
