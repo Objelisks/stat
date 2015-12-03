@@ -4,6 +4,7 @@ body {
 
 .graph {
   padding: 20px;
+  width: 1000px;
 }
 
 .line {
@@ -14,10 +15,23 @@ body {
   stroke-linejoin: round;
 }
 
+.x.axis line {
+  stroke: #777;
+  shape-rendering: crispEdges;
+}
+
 .y.axis line {
   stroke: #777;
   stroke-dasharray: 2,2;
   shape-rendering: crispEdges;
+}
+
+.fromdate {
+  float: left;
+}
+
+.todate {
+  float: right;
 }
 
 .data-input {

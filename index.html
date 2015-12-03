@@ -12,7 +12,9 @@
     </form>
   </div>
   <div class="graph" ng-controller="DataGraph">
-    <svg my-data-graph></svg>
+    <svg my-data-graph></svg><br/>
+    <div class="fromdate">FROM<input type="date" ng-model="startDate" ng-change="updateDates()"/></div>
+    <div class="todate">TO<input type="date" ng-model="endDate" ng-change="updateDates()"/></div>
   </div>
   <script src="angular.js"></script>
   <script src="d3.min.js"></script>

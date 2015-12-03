@@ -1,11 +1,11 @@
 var statModule = angular.module('stat', []);
 var sqlDateFormat = d3.time.format("%Y-%m-%d");
 
-statModule.value('startDate', d3.time.day.offset(new Date(), -7));
-statModule.value('endDate', d3.time.day(new Date()));
+statModule.factory('database', ['$rootScope', function($rootScope) {
+  var connection = io('http://localhost:8081');
 
-statModule.factory('database', ['startDate', 'endDate', '$rootScope', function(startDate, endDate, $rootScope) {
-  var connection = io('http://localhost:8080');
+  $rootScope.startDate = d3.time.day.offset(new Date(), -7);
+  $rootScope.endDate = d3.time.day(new Date());
 
   connection.on('message', function(msg) {
     // trigger angular event
@@ -15,8 +15,8 @@ statModule.factory('database', ['startDate', 'endDate', '$rootScope', function(s
   var getData = function() {
     connection.send({
       type: 'data',
-      start: sqlDateFormat(startDate),
-      end: sqlDateFormat(endDate)
+      start: sqlDateFormat($rootScope.startDate),
+      end: sqlDateFormat($rootScope.endDate)
     });
   };
 
@@ -29,8 +29,10 @@ statModule.factory('database', ['startDate', 'endDate', '$rootScope', function(s
   var uploadData = function(data) {
     connection.send({
       type: 'update',
-      data: data
+      date: data.date,
+      values: data.values
     });
+    setTimeout(getData, 500);
   };
 
   return {
@@ -52,12 +54,11 @@ statModule
 
     $scope.upload = function(data) {
       var packet = {
-        date: $scope.datapoint.date,
+        date: sqlDateFormat($scope.datapoint.date),
         values: $scope.tags.map(function(t) { return { tagid: t.tagid, val: t.value }; })
       }
 
       database.upload(packet);
-      console.log($scope.tags);
     }
     $scope.reset = function() {
       $scope.datapoint = { date: new Date() };
@@ -89,7 +90,7 @@ statModule
       paths.enter().append('path')
         .classed('line', true)
         .style('stroke', function(d, i) { return colors(i); })
-        .style('stroke-width', function(d, i) { return 6-i; });
+        .style('stroke-width', 2);
       paths.exit().remove();
       paths.each(function(d) { tagToLine[d.tagid] = this; });
 
@@ -101,7 +102,6 @@ statModule
 
       Object.keys(tagToLine).forEach(function(tagidstr) {
         var tagid = parseInt(tagidstr);
-        // TODO: figure out unique tags here
         var tagPoints = data.filter(function(d) { return d.tagid === tagid; });
 
         // update each line data to use the new points
@@ -111,8 +111,8 @@ statModule
     });
 
   }])
-  .directive('myDataGraph', ['database', 'startDate', 'endDate',
-  function(database, startDate, endDate) {
+  .directive('myDataGraph', ['database', '$rootScope',
+  function(database, $rootScope) {
     return {
       link: function (scope, element) {
         var width = 800;
@@ -130,17 +130,30 @@ statModule
           .range([height-35, 10]);
 
         scope.graphTime = d3.time.scale()
-          .domain([startDate, endDate])
+          .domain([$rootScope.startDate, $rootScope.endDate])
           .range([50, width-50]);
 
         // build the time axis
         var xAxis = d3.svg.axis()
           .scale(scope.graphTime)
-          .ticks(d3.time.days, 1)
-          .tickSize(0);
-        svg.append("g")
+          .ticks(6)
+          .tickSize(8, 0);
+        var timeline = svg.append("g")
           .attr("transform", "translate(0, " + (height-30) + ")")
+          .attr('class', 'x axis')
           .call(xAxis);
+
+        scope.updateDates = function() {
+          console.log('updating dates', scope.startDate);
+          $rootScope.startDate = scope.startDate;
+          $rootScope.endDate = scope.endDate;
+
+          scope.graphTime = scope.graphTime.domain([scope.startDate, scope.endDate]);
+          xAxis = xAxis.scale(scope.graphTime);
+          timeline = timeline.call(xAxis);
+
+          database.getData();
+        }
 
         // build the value axis
         var yAxis = d3.svg.axis()

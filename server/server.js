@@ -1,5 +1,5 @@
 var sqlite3 = require('sqlite3');
-var io = require('socket.io')(8080);
+var io = require('socket.io')(8081);
 
 var db = new sqlite3.Database('./db');
 
@@ -30,12 +30,13 @@ io.on('connection', function(socket) {
         // TODO: validate args more
         if(!msg.date) return;
 
-        var insertStatement = "INSERT INTO day VALUES ($date, $tagid, $val)";
-        var updateStatement = "UPDATE day SET day.val = $val WHERE day.date = $date AND day.tagid = $tagid";
-        var query = "SELECT day.val AS Value, day.tagid as Tag FROM day WHERE day.date = $date";
-        db.get(query, { $date: msg.date }, function(result) {
+        var insertStatement = "INSERT INTO day (date, tagid, val) VALUES ($date, $tagid, $val)";
+        var updateStatement = "UPDATE day SET val = $val WHERE date = $date AND tagid = $tagid";
+        var query = "SELECT count(*) as count FROM day WHERE date = $date";
+        db.get(query, { $date: msg.date }, function(err, result) {
+          if(err) console.log('ERROR', err);
           var useStatement;
-          if(result.length > 0) {
+          if(result.count > 0) {
             useStatement = updateStatement;
           } else {
             useStatement = insertStatement;
@@ -43,7 +44,7 @@ io.on('connection', function(socket) {
 
           var statement = db.prepare(useStatement);
           msg.values.forEach(function(value) {
-            statement.run({date: msg.date, tagid: value.tagid, val: value.val});
+            statement.run({$date: msg.date, $tagid: value.tagid, $val: value.val});
           });
           statement.finalize();
         });
